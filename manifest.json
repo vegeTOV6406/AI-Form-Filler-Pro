@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "AI Form Filler Pro",
+  "version": "5.2",
+  "description": "Профессиональное заполнение любых веб-форм с помощью ИИ",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://docs.google.com/forms/*",
+    "https://forms.office.com/*",
+    "https://*.hh.ru/*",
+    "https://forms.yandex.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://docs.google.com/forms/*",
+        "https://forms.office.com/*",
+        "https://*.hh.ru/*",
+        "https://forms.yandex.ru/*"
+      ],
+      "js": [
+        "content-scripts/main.js",
+        "content-scripts/form-handlers/google-forms.js",
+        "content-scripts/form-handlers/microsoft-forms.js",
+        "content-scripts/form-handlers/yandex-forms.js",
+        "content-scripts/form-handlers/hh-ru.js",
+        "content-scripts/form-handlers/generic-forms.js",
+        "content-scripts/ai-service.js",
+        "content-scripts/utils.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AI Form Filler Pro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="tabs">
+    <button class="tab active" data-tab="main">Заполнение</button>
+    <button class="tab" data-tab="resume">Резюме</button>
+    <button class="tab" data-tab="data">Данные</button>
+    <button class="tab" data-tab="prompt">Промпт</button>
+    <button class="tab" data-tab="ai">Настройки AI</button>
+  </div>
+
+  <div id="main-tab" class="tab-content active">
+    <h3>Заполнение формы</h3>
+    <p>Все настройки готовы. Нажмите кнопку ниже, чтобы начать автоматическое заполнение полей на текущей странице.</p>
+    
+    <div class="form-group">
+      <label>Стиль ответов:</label>
+      <select id="response-style">
+        <option value="professional">Профессиональный</option>
+        <option value="concise">Краткий и прямой</option>
+        <option value="natural">Естественный и разговорный</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Уровень креативности:</label>
+      <div class="range-container">
+        <div class="range-slider">
+          <input type="range" id="creativity-level" min="0.1" max="1.0" step="0.1" value="0.7">
+        </div>
+        <span id="creativity-value">0.7</span>
+      </div>
+    </div>
+    
+    <div id="status"></div>
+    
+    <div class="footer">
+      <button id="fill-form">Заполнить текущую форму</button>
+    </div>
+  </div>
+
+  <div id="resume-tab" class="tab-content">
+    <h3>Текст вашего резюме</h3>
+    <p>Вставьте сюда полный текст вашего резюме. Он будет использоваться как контекст для AI, чтобы ответы были максимально точными и соответствовали вашему опыту.</p>
+    <textarea id="resume-text" placeholder="Скопируйте и вставьте сюда текст вашего резюме..."></textarea>
+    <button id="save-resume">Сохранить резюме</button>
+  </div>
+
+  <div id="data-tab" class="tab-content">
+    <h3>Личные данные</h3>
+    <div class="form-group">
+      <label>ФИО:</label>
+      <input type="text" id="full_name" placeholder="Иванов Иван Иванович">
+    </div>
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" id="email" placeholder="example@domain.com">
+    </div>
+    <div class="form-group">
+      <label>Телефон:</label>
+      <input type="tel" id="phone" placeholder="+7 (999) 123-45-67">
+    </div>
+    <div class="form-group">
+      <label>Город:</label>
+      <input type="text" id="city" placeholder="Москва">
+    </div>
+    <div class="form-group">
+      <label>Ссылка на резюме:</label>
+      <input type="url" id="resume_url" placeholder="https://hh.ru/resume/...">
+    </div>
+    <div class="form-group">
+      <label>LinkedIn:</label>
+      <input type="url" id="linkedin" placeholder="https://linkedin.com/in/...">
+    </div>
+    <div class="form-group">
+      <label>GitHub:</label>
+      <input type="url" id="github" placeholder="https://github.com/...">
+    </div>
+    <div class="form-group">
+      <label>Telegram:</label>
+      <input type="url" id="telegram" placeholder="https://t.me/...">
+    </div>
+    
+    <h3>Профессиональные данные</h3>
+    <div class="form-group">
+      <label>Желаемая должность:</label>
+      <input type="text" id="role" placeholder="Маркетолог">
+    </div>
+    <div class="form-group">
+      <label>Сильные стороны:</label>
+      <textarea id="strengths" placeholder="Организация процессов, аналитика, стратегическое планирование"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Ключевые навыки:</label>
+      <textarea id="skills" placeholder="Яндекс.Директ, Google Analytics, SEO"></textarea>
+    </div>
+    
+    <button id="save-profile">Сохранить данные</button>
+  </div>
+
+  <div id="prompt-tab" class="tab-content">
+    <h3>Шаблон промпта</h3>
+    <div class="variables">
+      <strong>Доступные переменные:</strong>
+      <ul>
+        <li>{question} - Текст вопроса</li>
+        <li>{full_name} - ФИО</li>
+        <li>{email} - Email</li>
+        <li>{phone} - Телефон</li>
+        <li>{city} - Город</li>
+        <li>{role} - Должность</li>
+        <li>{strengths} - Сильные стороны</li>
+        <li>{skills} - Навыки</li>
+        <li>{resume_text} - Текст резюме</li>
+        <li>{has_relevant_info} - Есть ли информация в резюме (да/нет)</li>
+      </ul>
+    </div>
+    <p><strong>Совет:</strong> Используйте {has_relevant_info}, чтобы AI понимал, когда можно быть креативным, а когда нужно строго следовать резюме.</p>
+    <textarea id="prompt-template" placeholder="Введите шаблон промпта..."></textarea>
+    <div class="form-group">
+      <button id="save-prompt">Сохранить промпт</button>
+      <button id="reset-prompt" class="secondary">Сбросить к стандартному</button>
+    </div>
+  </div>
+
+  <div id="ai-tab" class="tab-content">
+    <h3>Настройки нейросети</h3>
+    <div class="security-warning">
+      <strong>⚠️ Безопасность:</strong> Ваш API-ключ хранится локально в браузере. Для критически важных данных используйте прокси-сервер.
+    </div>
+    
+    <div class="form-group">
+      <label>Провайдер:</label>
+      <select id="ai-provider">
+        <option value="gemini">Google Gemini</option>
+        <option value="openai">OpenAI</option>
+        <option value="anthropic">Anthropic (Claude)</option>
+        <option value="aitunnel">AITunnel</option>
+        <option value="bothub">Bothub</option>
+        <option value="local">Локальная модель</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>API ключ:</label>
+      <input type="password" id="api-key">
+    </div>
+    
+    <div class="form-group" id="model-group">
+      <label>Модель:</label>
+      <select id="ai-model">
+        </select>
+    </div>
+    
+    <div class="form-group" id="base-url-group" style="display:none">
+      <label>Базовый URL:</label>
+      <input type="text" id="base-url" placeholder="http://localhost:11434/v1/">
+    </div>
+    
+    <div class="button-group">
+      <button id="save-ai">Сохранить настройки</button>
+      <button id="test-ai">Проверить подключение</button>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
